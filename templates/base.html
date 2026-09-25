@@ -23,36 +23,13 @@
   {% block extra_css %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
-  <!-- Animated Vehicle Theme Splash Screen -->
+  <!-- Minimalist Brand Logo Splash Screen -->
   <div id="app-splash-screen" class="splash-screen-overlay">
     <div class="splash-content">
-      <div class="splash-brand">
-        <div class="splash-logo-wrap">
-          <img src="{% static 'img/logo.png' %}" alt="ParkEase Logo" class="splash-logo-img">
-          <div class="splash-logo-glow"></div>
-        </div>
-        <div class="splash-title">Park<span class="brand-accent">Ease</span></div>
-        <div class="splash-tagline">PARK SMART &bull; LIVE EASY</div>
+      <div class="splash-logo-wrap">
+        <img src="{% static 'img/logo.png' %}" alt="ParkEase Logo" class="splash-logo-img">
+        <div class="splash-logo-glow"></div>
       </div>
-
-      <!-- Vehicle Driving & Parking Animation Track -->
-      <div class="splash-vehicle-track">
-        <div class="splash-road-line"></div>
-        <div class="splash-vehicle car-anim">
-          <i class="bi bi-car-front-fill"></i>
-          <span class="splash-headlight-beam"></span>
-        </div>
-        <div class="splash-parking-target">
-          <span class="splash-p-badge">P</span>
-          <i class="bi bi-check-circle-fill splash-check-badge"></i>
-        </div>
-      </div>
-
-      <!-- Animated Splash Progress Bar -->
-      <div class="splash-progress-wrapper">
-        <div class="splash-progress-bar" id="splashProgressBar"></div>
-      </div>
-      <div class="splash-status-text">INITIALIZING SMART PARKING GRID...</div>
     </div>
   </div>
 

@@ -1138,7 +1138,7 @@ body {
 .parking-bay-grid .bay-card:nth-child(8) { animation-delay: 0.16s; }
 
 /* ==========================================================================
-   VEHICLE THEMED SPLASH SCREEN & HOME SMART RIBBONS
+   MINIMALIST LOGO SPLASH SCREEN
    ========================================================================== */
 
 /* Splash Screen Full-Screen Overlay */
@@ -1146,7 +1146,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 100000;
-  background: radial-gradient(circle at 50% 32%, #44174E 0%, #1B1931 100%);
+  background: radial-gradient(circle at 50% 40%, #44174E 0%, #1B1931 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1155,231 +1155,63 @@ body {
   user-select: none;
   touch-action: none;
   cursor: pointer;
-  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.45s;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
 }
 
 .splash-screen-overlay.hide-splash {
   opacity: 0;
-  transform: scale(1.06);
+  transform: scale(1.08);
   pointer-events: none;
   visibility: hidden;
 }
 
 .splash-content {
-  width: 90%;
-  max-width: 380px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: splashFadeIn 0.4s ease-out;
+  justify-content: center;
+  animation: splashFadeIn 0.35s ease-out;
 }
 
 @keyframes splashFadeIn {
-  0% { opacity: 0; transform: translateY(14px) scale(0.96); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% { opacity: 0; transform: scale(0.88); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 .splash-logo-wrap {
   position: relative;
-  margin-bottom: 14px;
   display: inline-block;
 }
 
 .splash-logo-img {
-  width: 72px;
-  height: 72px;
-  border-radius: 18px;
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
   object-fit: cover;
-  box-shadow: 0 10px 28px rgba(237, 158, 91, 0.4);
+  box-shadow: 0 16px 40px rgba(237, 158, 91, 0.45);
   position: relative;
   z-index: 2;
-  animation: splashLogoPulse 1.8s infinite alternate ease-in-out;
+  animation: splashLogoPulse 1.4s infinite alternate ease-in-out;
 }
 
 .splash-logo-glow {
   position: absolute;
-  inset: -8px;
-  background: radial-gradient(circle, rgba(237, 158, 91, 0.45) 0%, transparent 70%);
-  border-radius: 26px;
+  inset: -12px;
+  background: radial-gradient(circle, rgba(237, 158, 91, 0.55) 0%, transparent 70%);
+  border-radius: 36px;
   z-index: 1;
-  filter: blur(8px);
+  filter: blur(12px);
+  animation: splashGlowPulse 1.4s infinite alternate ease-in-out;
 }
 
 @keyframes splashLogoPulse {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.05); }
+  0% { transform: scale(0.96); }
+  100% { transform: scale(1.06); }
 }
 
-.splash-title {
-  font-weight: 800;
-  font-size: 2.1rem;
-  letter-spacing: -0.04em;
-  color: #ffffff;
-  margin-bottom: 2px;
-}
-
-.splash-tagline {
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.22em;
-  color: var(--c5-orange);
-  margin-bottom: 24px;
-  text-transform: uppercase;
-}
-
-/* Vehicle Animation Track */
-.splash-vehicle-track {
-  width: 100%;
-  height: 64px;
-  background: rgba(27, 25, 49, 0.65);
-  border: 1px solid rgba(233, 188, 185, 0.2);
-  border-radius: var(--radius-md);
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
-}
-
-.splash-road-line {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 2px;
-  background: repeating-linear-gradient(90deg, var(--c5-orange) 0, var(--c5-orange) 12px, transparent 12px, transparent 24px);
-  opacity: 0.4;
-  animation: splashRoadMove 0.6s linear infinite;
-}
-
-@keyframes splashRoadMove {
-  0% { background-position: 0 0; }
-  100% { background-position: -24px 0; }
-}
-
-.splash-vehicle {
-  position: absolute;
-  top: 50%;
-  left: 12px;
-  transform: translateY(-50%);
-  font-size: 1.85rem;
-  color: var(--c5-orange);
-  display: flex;
-  align-items: center;
-  z-index: 3;
-  animation: splashDriveIntoBay 1.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-.splash-headlight-beam {
-  position: absolute;
-  left: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 32px;
-  height: 18px;
-  background: linear-gradient(90deg, rgba(237, 158, 91, 0.75) 0%, rgba(237, 158, 91, 0) 100%);
-  clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 60%);
-  pointer-events: none;
-  filter: blur(1px);
-}
-
-@keyframes splashDriveIntoBay {
-  0% {
-    left: 8px;
-    transform: translateY(-50%) scale(0.95);
-  }
-  75% {
-    left: calc(100% - 90px);
-    transform: translateY(-50%) scale(1.05);
-  }
-  100% {
-    left: calc(100% - 75px);
-    transform: translateY(-50%) scale(1);
-  }
-}
-
-.splash-parking-target {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
-  border: 2px dashed rgba(237, 158, 91, 0.45);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(102, 34, 73, 0.25);
-  z-index: 2;
-  animation: splashTargetGlow 1.25s forwards;
-}
-
-.splash-p-badge {
-  font-family: var(--font-mono);
-  font-weight: 800;
-  font-size: 1.1rem;
-  color: rgba(233, 188, 185, 0.6);
-  transition: opacity 0.2s ease;
-}
-
-.splash-check-badge {
-  position: absolute;
-  font-size: 1.4rem;
-  color: #10b981;
-  opacity: 0;
-  transform: scale(0.4);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes splashTargetGlow {
-  0%, 75% {
-    border-color: rgba(237, 158, 91, 0.45);
-    box-shadow: none;
-  }
-  100% {
-    border-color: #10b981;
-    border-style: solid;
-    background: rgba(16, 185, 129, 0.15);
-    box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
-  }
-}
-
-.splash-parking-target.parked .splash-p-badge {
-  opacity: 0;
-}
-
-.splash-parking-target.parked .splash-check-badge {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* Splash Progress Indicator */
-.splash-progress-wrapper {
-  width: 170px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
-  overflow: hidden;
-  margin-top: 4px;
-}
-
-.splash-progress-bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--c5-orange) 0%, var(--c4-crimson) 60%, var(--c6-blush) 100%);
-  border-radius: 999px;
-  transition: width 1.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.splash-status-text {
-  font-family: var(--font-mono);
-  font-size: 0.64rem;
-  color: rgba(233, 188, 185, 0.7);
-  letter-spacing: 0.12em;
-  margin-top: 10px;
-  font-weight: 600;
+@keyframes splashGlowPulse {
+  0% { opacity: 0.5; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1.15); }
 }
 
 @media print {

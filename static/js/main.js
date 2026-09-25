@@ -2,43 +2,26 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // -------------------------------------------------------------------------
-    // App Launch Vehicle Splash Screen Handler
+    // App Launch Minimalist Logo Splash Screen Handler
     // -------------------------------------------------------------------------
     const splashScreen = document.getElementById('app-splash-screen');
-    const splashBar = document.getElementById('splashProgressBar');
-    const splashTarget = document.querySelector('.splash-parking-target');
 
     if (splashScreen) {
         const hasSeenSplash = sessionStorage.getItem('parkease_splash_session');
 
         const dismissSplash = () => {
-            if (splashTarget) splashTarget.classList.add('parked');
-            if (splashBar) splashBar.style.width = '100%';
-            setTimeout(() => {
-                splashScreen.classList.add('hide-splash');
-                sessionStorage.setItem('parkease_splash_session', 'true');
-            }, 250);
+            splashScreen.classList.add('hide-splash');
+            sessionStorage.setItem('parkease_splash_session', 'true');
         };
 
         // Tap anywhere to skip instantly
         splashScreen.addEventListener('click', dismissSplash);
 
         if (!hasSeenSplash) {
-            // Animate progress bar fill
+            // Smooth exit transition after 1.1s
             setTimeout(() => {
-                if (splashBar) splashBar.style.width = '100%';
-            }, 60);
-
-            // Car reaches target bay -> illuminate bay & pop green checkmark
-            setTimeout(() => {
-                if (splashTarget) splashTarget.classList.add('parked');
-            }, 850);
-
-            // Auto smooth exit transition
-            setTimeout(() => {
-                splashScreen.classList.add('hide-splash');
-                sessionStorage.setItem('parkease_splash_session', 'true');
-            }, 1450);
+                dismissSplash();
+            }, 1100);
         } else {
             // Fast fade if already seen in current browsing session
             splashScreen.classList.add('hide-splash');
