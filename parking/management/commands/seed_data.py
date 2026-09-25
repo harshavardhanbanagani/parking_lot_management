@@ -10,10 +10,29 @@ from parking.models import (
 
 
 class Command(BaseCommand):
-    help = 'Seeds initial parking slots, pricing, default admin user, and demo bookings.'
+    help = 'Seeds initial parking slots, pricing, default admin user, and optional demo bookings.'
 
-    def handle(self, *args, **kwargs):
-        self.stdout.write("Starting database seeding...")
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--with-samples',
+            action='store_true',
+            help='Create sample/demo bookings and payments for testing.'
+        )
+        parser.add_argument(
+            '--clear-bookings',
+            action='store_true',
+            help='Clear all existing booking and payment records.'
+        )
+
+    def handle(self, *args, **options):
+        self.stdout.write("Starting database setup...")
+
+        if options.get('clear_bookings'):
+            b_cnt = Booking.objects.count()
+            p_cnt = Payment.objects.count()
+            Payment.objects.all().delete()
+            Booking.objects.all().delete()
+            self.stdout.write(self.style.WARNING(f"Cleared {b_cnt} bookings and {p_cnt} payments."))
 
         # 1. Create Default Admin User
         admin_user, created = User.objects.get_or_create(username='admin')
@@ -69,90 +88,38 @@ class Command(BaseCommand):
             )
             bike_slots.append(slot)
 
-        self.stdout.write(self.style.SUCCESS("Created 10 Car slots (A01-A10) and 10 Bike slots (B01-B10)."))
+        self.stdout.write(self.style.SUCCESS("Verified 10 Car slots (A01-A10) and 10 Bike slots (B01-B10)."))
 
-        # 4. Create Sample Bookings for Demonstration
-        today = timezone.localdate()
+        # 4. Optional Sample Bookings
+        if options.get('with_samples'):
+            today = timezone.localdate()
 
-        # Sample 1: Active parked car in A01
-        b1, c1 = Booking.objects.get_or_create(
-            booking_id="PB20260001",
-            defaults={
-                'customer_name': "Rahul Sharma",
-                'phone': "9876543210",
-                'email': "rahul.sharma@example.com",
-                'vehicle_number': "AP39AB1234",
-                'vehicle_type': VehicleType.CAR,
-                'parking_slot': car_slots[0], # A01
-                'booking_date': today,
-                'start_time': datetime.time(9, 0),
-                'end_time': datetime.time(13, 0),
-                'amount': Decimal('120.00'),
-                'status': BookingStatus.ACTIVE,
-                'check_in_time': timezone.now() - datetime.timedelta(hours=1)
-            }
-        )
-        if c1:
-            Payment.objects.create(
-                transaction_id="TXN202609010001",
-                booking=b1,
-                amount=b1.amount,
-                payment_method=PaymentMethod.UPI,
-                payment_status=PaymentStatus.PAID
+            b1, c1 = Booking.objects.get_or_create(
+                booking_id="PB20260001",
+                defaults={
+                    'customer_name': "Rahul Sharma",
+                    'phone': "9876543210",
+                    'email': "rahul.sharma@example.com",
+                    'vehicle_number': "AP39AB1234",
+                    'vehicle_type': VehicleType.CAR,
+                    'parking_slot': car_slots[0],
+                    'booking_date': today,
+                    'start_time': datetime.time(9, 0),
+                    'end_time': datetime.time(13, 0),
+                    'amount': Decimal('120.00'),
+                    'status': BookingStatus.ACTIVE,
+                    'check_in_time': timezone.now() - datetime.timedelta(hours=1)
+                }
             )
+            if c1:
+                Payment.objects.create(
+                    transaction_id="TXN202609010001",
+                    booking=b1,
+                    amount=b1.amount,
+                    payment_method=PaymentMethod.UPI,
+                    payment_status=PaymentStatus.PAID
+                )
 
-        # Sample 2: Confirmed booking in A02
-        b2, c2 = Booking.objects.get_or_create(
-            booking_id="PB20260002",
-            defaults={
-                'customer_name': "Priya Verma",
-                'phone': "9812345678",
-                'email': "priya@example.com",
-                'vehicle_number': "DL01XY9876",
-                'vehicle_type': VehicleType.CAR,
-                'parking_slot': car_slots[1], # A02
-                'booking_date': today,
-                'start_time': datetime.time(14, 0),
-                'end_time': datetime.time(17, 0),
-                'amount': Decimal('90.00'),
-                'status': BookingStatus.CONFIRMED
-            }
-        )
-        if c2:
-            Payment.objects.create(
-                transaction_id="TXN202609010002",
-                booking=b2,
-                amount=b2.amount,
-                payment_method=PaymentMethod.CARD,
-                payment_status=PaymentStatus.PAID
-            )
+            self.stdout.write(self.style.SUCCESS("Sample demo bookings created."))
 
-        # Sample 3: Completed bike booking in B01
-        b3, c3 = Booking.objects.get_or_create(
-            booking_id="PB20260003",
-            defaults={
-                'customer_name': "Harsha Vardhan",
-                'phone': "9988776655",
-                'email': "harsha@example.com",
-                'vehicle_number': "KA03MN4567",
-                'vehicle_type': VehicleType.BIKE,
-                'parking_slot': bike_slots[0], # B01
-                'booking_date': today,
-                'start_time': datetime.time(8, 0),
-                'end_time': datetime.time(10, 0),
-                'amount': Decimal('30.00'),
-                'status': BookingStatus.COMPLETED,
-                'check_in_time': timezone.now() - datetime.timedelta(hours=4),
-                'check_out_time': timezone.now() - datetime.timedelta(hours=2)
-            }
-        )
-        if c3:
-            Payment.objects.create(
-                transaction_id="TXN202609010003",
-                booking=b3,
-                amount=b3.amount,
-                payment_method=PaymentMethod.CASH,
-                payment_status=PaymentStatus.PAID
-            )
-
-        self.stdout.write(self.style.SUCCESS("Database seeding completed successfully!"))
+        self.stdout.write(self.style.SUCCESS("Database setup completed successfully!"))
