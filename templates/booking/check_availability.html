@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Live Floor Map &bull; ParkEase{% endblock %}
+
+{% block content %}
+<div class="container px-3 px-lg-4 py-3">
+  
+  <!-- Search Filter Header Card -->
+  <div class="app-card p-3 p-md-4 mb-3">
+    <div class="d-flex align-items-center justify-content-between mb-2.5 pb-2 border-bottom">
+      <div class="fw-bold d-flex align-items-center gap-1.5" style="color: var(--c1-navy); font-size: 0.95rem;">
+        <i class="bi bi-sliders" style="color: var(--c5-orange);"></i> Parking Window & Category
+      </div>
+      <span class="badge" style="background: rgba(237,158,91,0.2); color: #ab5712; font-size: 0.7rem; font-weight: 700;">LIVE MAP</span>
+    </div>
+
+    <form method="get" action="{% url 'check_availability' %}" class="row g-2 align-items-end" id="availabilityForm">
+      <div class="col-12 col-md-3">
+        <label class="form-label">Parking Date</label>
+        {{ form.booking_date }}
+        {% if form.booking_date.errors %}
+          <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ form.booking_date.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label">Start Time</label>
+        {{ form.start_time }}
+        {% if form.start_time.errors %}
+          <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ form.start_time.errors.0 }}</div>
+        {% endif %}
+      </div>
+      <div class="col-6 col-md-2">
+        <label class="form-label">End Time</label>
+        {{ form.end_time }}
+        {% if form.end_time.errors %}
+          <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ form.end_time.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Animated Vehicle Select Cards -->
+      <div class="col-12 col-md-3">
+        <label class="form-label">Vehicle Type</label>
+        <input type="hidden" name="vehicle_type" id="avail_vehicle_type" value="{{ form.vehicle_type.value|default:'CAR' }}">
+        
+        <div class="vehicle-selector-group mb-0">
+          <div class="vehicle-select-card {% if form.vehicle_type.value == 'CAR' or not form.vehicle_type.value %}active{% endif %}" data-vehicle="CAR" data-target="avail_vehicle_type">
+            <div class="vehicle-card-icon" style="font-size: 1.3rem;">
+              <i class="bi bi-car-front-fill"></i>
+            </div>
+            <div class="vehicle-card-title" style="font-size: 0.75rem;">Car</div>
+          </div>
+
+          <div class="vehicle-select-card {% if form.vehicle_type.value == 'BIKE' %}active{% endif %}" data-vehicle="BIKE" data-target="avail_vehicle_type">
+            <div class="vehicle-card-icon" style="font-size: 1.3rem;">
+              <i class="bi bi-bicycle"></i>
+            </div>
+            <div class="vehicle-card-title" style="font-size: 0.75rem;">Bike</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-2">
+        <button type="submit" class="btn-app-primary w-100" style="min-height: 44px;">
+          <i class="bi bi-search"></i> Check Map
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {% if searched %}
+    <!-- Active Window Badge & Map Legend -->
+    <div class="app-card-inset mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <div class="rounded-circle p-2 d-flex align-items-center justify-content-center" style="background: rgba(237,158,91,0.2); color: var(--c5-orange); width: 34px; height: 34px;">
+          {% if search_params.vehicle_type == 'CAR' %}
+            <i class="bi bi-car-front-fill anim-car-drive fs-6"></i>
+          {% else %}
+            <i class="bi bi-bicycle anim-bike-drive fs-6"></i>
+          {% endif %}
+        </div>
+        <div>
+          <div class="fw-bold" style="font-size: 0.85rem; color: var(--c1-navy);">
+            {{ search_params.booking_date }}
+            <span class="mx-1 text-muted">&bull;</span>
+            {{ search_params.start_time }} - {{ search_params.end_time }}
+            <span class="badge ms-1" style="background: var(--c1-navy); color: #fff; font-size: 0.65rem;">{{ search_params.duration_hours }} hrs</span>
+          </div>
+          <div class="text-muted" style="font-size: 0.72rem;">Category: <strong>{{ search_params.vehicle_type }}</strong> &bull; Rate: <strong>₹{{ rate }}/hr</strong></div>
+        </div>
+      </div>
+
+      <!-- Compact Legend -->
+      <div class="d-flex align-items-center gap-3" style="font-size: 0.75rem; font-weight: 600;">
+        <div class="d-flex align-items-center gap-1.5">
+          <span style="width: 10px; height: 10px; background: var(--c5-orange); border-radius: 50%; display: inline-block; box-shadow: 0 0 6px var(--c5-orange);"></span>
+          <span style="color: var(--c1-navy);">Available</span>
+        </div>
+        <div class="d-flex align-items-center gap-1.5">
+          <span style="width: 10px; height: 10px; background: var(--c4-crimson); border-radius: 50%; display: inline-block;"></span>
+          <span style="color: var(--c4-crimson);">Booked</span>
+        </div>
+        <div class="d-flex align-items-center gap-1.5">
+          <span style="width: 10px; height: 10px; background: var(--c3-burgundy); border-radius: 50%; display: inline-block;"></span>
+          <span style="color: var(--c3-burgundy);">Occupied</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Parking Bays Grid -->
+    {% if slots_with_status %}
+      <div class="parking-bay-grid mb-4">
+        {% for item in slots_with_status %}
+          {% if item.status == 'AVAILABLE' %}
+            <a href="{% url 'select_slot' item.slot.id %}" class="text-decoration-none">
+              <div class="bay-card available">
+                <div class="bay-icon">
+                  {% if item.slot.vehicle_type == 'CAR' %}
+                    <i class="bi bi-car-front-fill"></i>
+                  {% else %}
+                    <i class="bi bi-bicycle"></i>
+                  {% endif %}
+                </div>
+                <div class="bay-code">{{ item.slot.slot_number }}</div>
+                <span class="bay-badge bay-badge-available">
+                  <i class="bi bi-check-circle-fill me-1"></i> TAP TO BOOK
+                </span>
+              </div>
+            </a>
+          {% elif item.status == 'BOOKED' %}
+            <div class="bay-card booked">
+              <div class="bay-icon">
+                {% if item.slot.vehicle_type == 'CAR' %}
+                  <i class="bi bi-car-front-fill"></i>
+                {% else %}
+                  <i class="bi bi-bicycle"></i>
+                {% endif %}
+              </div>
+              <div class="bay-code">{{ item.slot.slot_number }}</div>
+              <span class="bay-badge bay-badge-booked">BOOKED</span>
+            </div>
+          {% else %}
+            <div class="bay-card occupied">
+              <div class="bay-icon">
+                {% if item.slot.vehicle_type == 'CAR' %}
+                  <i class="bi bi-car-front-fill"></i>
+                {% else %}
+                  <i class="bi bi-bicycle"></i>
+                {% endif %}
+              </div>
+              <div class="bay-code">{{ item.slot.slot_number }}</div>
+              <span class="bay-badge bay-badge-occupied">OCCUPIED</span>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="app-card text-center p-4">
+        <i class="bi bi-exclamation-circle text-muted fs-3 mb-2"></i>
+        <h6 class="fw-bold" style="color: var(--c1-navy);">No parking bays found</h6>
+        <p class="small text-muted mb-0">No slots configured for {{ search_params.vehicle_type }}.</p>
+      </div>
+    {% endif %}
+
+  {% else %}
+    <div class="app-card p-4 text-center">
+      <div class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background: rgba(237,158,91,0.15); color: var(--c5-orange); font-size: 1.4rem;">
+        <i class="bi bi-compass anim-headlights"></i>
+      </div>
+      <h6 class="fw-bold mb-1" style="color: var(--c1-navy);">Set Your Parking Timing & Vehicle</h6>
+      <p class="small text-muted mb-0" style="max-width: 340px; margin: 0 auto;">Select your vehicle type, date and parking hours to reveal live bay availability.</p>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Demo Payment &bull; ParkEase{% endblock %}
+
+{% block content %}
+<div class="container px-3 py-3">
+  
+  <!-- App Stepper -->
+  <div class="app-stepper px-2 mb-3">
+    <div class="step-item completed">
+      <div class="step-bubble"><i class="bi bi-check"></i></div>
+      <div class="step-label">Bay</div>
+    </div>
+    <div class="step-item completed">
+      <div class="step-bubble"><i class="bi bi-check"></i></div>
+      <div class="step-label">Details</div>
+    </div>
+    <div class="step-item completed">
+      <div class="step-bubble"><i class="bi bi-check"></i></div>
+      <div class="step-label">Review</div>
+    </div>
+    <div class="step-item active">
+      <div class="step-bubble">4</div>
+      <div class="step-label">Pay</div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
+      <div class="app-card p-3 p-md-4">
+        
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+          <div>
+            <div class="fw-bold" style="color: var(--c1-navy); font-size: 0.95rem;">Payment Simulation</div>
+            <div class="text-muted small" style="font-size: 0.72rem;">Select payment method</div>
+          </div>
+          <span class="badge" style="background: var(--c5-orange); color: #1B1931; font-size: 0.9rem; font-weight: 800;">
+            ₹{{ booking.total_amount }}
+          </span>
+        </div>
+
+        <!-- Quick Summary Inset -->
+        <div class="app-card-inset mb-3 d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fw-bold small" style="color: var(--c1-navy);">Bay {{ booking.slot_number }} ({{ booking.vehicle_type }})</div>
+            <div class="text-muted" style="font-size: 0.72rem;">{{ booking.booking_date }} &bull; {{ booking.duration_hours }} hr(s)</div>
+          </div>
+          <span class="badge" style="background: var(--c1-navy); color: #ffffff; font-size: 0.75rem;">{{ booking.vehicle_number }}</span>
+        </div>
+
+        <form method="post" action="{% url 'payment' %}">
+          {% csrf_token %}
+          
+          <label class="form-label mb-2">Select Method</label>
+          <div class="row g-2 mb-3">
+            <div class="col-4">
+              <input type="radio" class="btn-check" name="payment_method" id="pay_upi" value="UPI" checked>
+              <label class="btn btn-outline-dark w-100 p-2 text-center rounded-3 d-flex flex-column align-items-center" for="pay_upi" style="border-color: rgba(233,188,185,0.8);">
+                <i class="bi bi-phone fs-4" style="color: var(--c5-orange);"></i>
+                <span class="fw-bold" style="font-size: 0.75rem; color: var(--c1-navy);">UPI</span>
+              </label>
+            </div>
+
+            <div class="col-4">
+              <input type="radio" class="btn-check" name="payment_method" id="pay_card" value="CARD">
+              <label class="btn btn-outline-dark w-100 p-2 text-center rounded-3 d-flex flex-column align-items-center" for="pay_card" style="border-color: rgba(233,188,185,0.8);">
+                <i class="bi bi-credit-card fs-4" style="color: var(--c2-purple);"></i>
+                <span class="fw-bold" style="font-size: 0.75rem; color: var(--c1-navy);">Card</span>
+              </label>
+            </div>
+
+            <div class="col-4">
+              <input type="radio" class="btn-check" name="payment_method" id="pay_cash" value="CASH">
+              <label class="btn btn-outline-dark w-100 p-2 text-center rounded-3 d-flex flex-column align-items-center" for="pay_cash" style="border-color: rgba(233,188,185,0.8);">
+                <i class="bi bi-cash-stack fs-4" style="color: var(--c3-burgundy);"></i>
+                <span class="fw-bold" style="font-size: 0.75rem; color: var(--c1-navy);">Cash</span>
+              </label>
+            </div>
+          </div>
+
+          <div id="upi-details" class="app-card-inset mb-3 text-center py-2.5">
+            <div class="fw-semibold small" style="color: var(--c1-navy);"><i class="bi bi-phone me-1" style="color: var(--c5-orange);"></i> UPI Demo Mode</div>
+            <div class="text-muted" style="font-size: 0.72rem;">Instant simulation & pass generation</div>
+          </div>
+
+          <div id="card-details" class="app-card-inset mb-3 text-center py-2.5" style="display: none;">
+            <div class="fw-semibold small" style="color: var(--c1-navy);"><i class="bi bi-credit-card me-1" style="color: var(--c2-purple);"></i> Card Demo Mode</div>
+            <div class="text-muted" style="font-size: 0.72rem;">Simulates credit/debit transaction</div>
+          </div>
+
+          <div id="cash-details" class="app-card-inset mb-3 text-center py-2.5" style="display: none;">
+            <div class="fw-semibold small" style="color: var(--c1-navy);"><i class="bi bi-cash-stack me-1" style="color: var(--c3-burgundy);"></i> Cash at Counter</div>
+            <div class="text-muted" style="font-size: 0.72rem;">₹{{ booking.total_amount }} payable on arrival</div>
+          </div>
+
+          <button type="submit" class="btn-app-primary mb-2">
+            <i class="bi bi-check-circle-fill"></i> Complete Payment (₹{{ booking.total_amount }})
+          </button>
+          
+          <div class="text-center">
+            <a href="{% url 'booking_review' %}" class="small text-muted text-decoration-none">&larr; Back to Review</a>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      document.getElementById('upi-details').style.display = this.value === 'UPI' ? 'block' : 'none';
+      document.getElementById('card-details').style.display = this.value === 'CARD' ? 'block' : 'none';
+      document.getElementById('cash-details').style.display = this.value === 'CASH' ? 'block' : 'none';
+    });
+  });
+</script>
+{% endblock %}

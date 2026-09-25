@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>{% block title %}ParkEase &bull; Smart Parking Slot Reservation System{% endblock %}</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{% static 'img/logo.png' %}">
+
+  <!-- Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- Custom Design System CSS -->
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <!-- Animated Vehicle Theme Splash Screen -->
+  <div id="app-splash-screen" class="splash-screen-overlay">
+    <div class="splash-content">
+      <div class="splash-brand">
+        <div class="splash-logo-wrap">
+          <img src="{% static 'img/logo.png' %}" alt="ParkEase Logo" class="splash-logo-img">
+          <div class="splash-logo-glow"></div>
+        </div>
+        <div class="splash-title">Park<span class="brand-accent">Ease</span></div>
+        <div class="splash-tagline">PARK SMART &bull; LIVE EASY</div>
+      </div>
+
+      <!-- Vehicle Driving & Parking Animation Track -->
+      <div class="splash-vehicle-track">
+        <div class="splash-road-line"></div>
+        <div class="splash-vehicle car-anim">
+          <i class="bi bi-car-front-fill"></i>
+          <span class="splash-headlight-beam"></span>
+        </div>
+        <div class="splash-parking-target">
+          <span class="splash-p-badge">P</span>
+          <i class="bi bi-check-circle-fill splash-check-badge"></i>
+        </div>
+      </div>
+
+      <!-- Animated Splash Progress Bar -->
+      <div class="splash-progress-wrapper">
+        <div class="splash-progress-bar" id="splashProgressBar"></div>
+      </div>
+      <div class="splash-status-text">INITIALIZING SMART PARKING GRID...</div>
+    </div>
+  </div>
+
+  <!-- Top Page Transition Progress Indicator -->
+  <div id="app-page-progress"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="app-header no-print">
+    <div class="container px-3 px-lg-4">
+      <div class="top-bar-inner">
+        
+        <!-- Brand Logo & Website Name -->
+        <a class="app-brand" href="{% url 'home' %}">
+          <img src="{% static 'img/logo.png' %}" alt="ParkEase Logo" class="brand-logo-img">
+          <div class="d-flex flex-column justify-content-center">
+            <span class="brand-title">Park<span class="brand-accent">Ease</span></span>
+            <span class="brand-subtitle">PARK SMART &bull; LIVE EASY</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="d-none d-lg-flex align-items-center gap-2">
+          <a class="desktop-nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+            <i class="bi bi-house-door"></i> Home
+          </a>
+          <a class="desktop-nav-link {% if request.resolver_match.url_name == 'check_availability' %}active{% endif %}" href="{% url 'check_availability' %}">
+            <i class="bi bi-grid-fill"></i> Reserve Bay
+          </a>
+          <a class="desktop-nav-link {% if request.resolver_match.url_name == 'check_booking' %}active{% endif %}" href="{% url 'check_booking' %}">
+            <i class="bi bi-ticket-perforated"></i> My Pass
+          </a>
+        </nav>
+
+        <!-- Right Quick Actions -->
+        <div class="d-flex align-items-center gap-2">
+          <div class="live-beacon-pill">
+            <span class="pulse-dot"></span> <span class="d-none d-sm-inline">Live Sensor Grid</span><span class="d-sm-none">Live</span>
+          </div>
+
+          {% if user.is_authenticated and user.is_staff %}
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-app-dark py-1 px-3" style="font-size: 0.85rem; min-height: 34px;">
+              <i class="bi bi-speedometer2 me-1"></i> Admin
+            </a>
+            <a href="{% url 'admin_logout' %}" class="btn btn-app-secondary py-1 px-2.5" style="font-size: 0.85rem; min-height: 34px;" title="Logout">
+              <i class="bi bi-box-arrow-right"></i>
+            </a>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Alerts -->
+  <div class="container px-3 px-lg-4 mt-3 no-print">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags|default:'info' }} app-card-inset alert-dismissible fade show shadow-sm border-0 mb-2 py-2.5 px-3" role="alert">
+          <div class="d-flex align-items-center">
+            {% if message.tags == 'success' %}
+              <i class="bi bi-check-circle-fill me-2 fs-5 text-success"></i>
+            {% elif message.tags == 'error' or message.tags == 'danger' %}
+              <i class="bi bi-exclamation-triangle-fill me-2 fs-5 text-danger"></i>
+            {% elif message.tags == 'warning' %}
+              <i class="bi bi-exclamation-circle-fill me-2 fs-5 text-warning"></i>
+            {% else %}
+              <i class="bi bi-info-circle-fill me-2 fs-5" style="color: var(--c2-purple);"></i>
+            {% endif %}
+            <div class="fw-semibold small" style="color: var(--c1-navy);">{{ message }}</div>
+          </div>
+          <button type="button" class="btn-close" style="padding: 0.75rem;" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- Main Content Body -->
+  <main class="main-content">
+    {% block content %}
+    {% endblock %}
+  </main>
+
+  <!-- Customer Mobile Bottom Tab Navigation -->
+  <nav class="mobile-bottom-bar no-print">
+    <a href="{% url 'home' %}" class="mobile-tab-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+      <i class="bi bi-house-door-fill"></i>
+      <span>Home</span>
+    </a>
+    <a href="{% url 'check_availability' %}" class="mobile-tab-item {% if request.resolver_match.url_name == 'check_availability' or 'slot' in request.resolver_match.url_name or 'booking' in request.resolver_match.url_name and 'admin' not in request.resolver_match.url_name and request.resolver_match.url_name != 'check_booking' %}active{% endif %}">
+      <i class="bi bi-grid-fill"></i>
+      <span>Reserve</span>
+    </a>
+    <a href="{% url 'check_booking' %}" class="mobile-tab-item {% if request.resolver_match.url_name == 'check_booking' %}active{% endif %}">
+      <i class="bi bi-ticket-perforated-fill"></i>
+      <span>My Pass</span>
+    </a>
+    {% if user.is_authenticated and user.is_staff %}
+      <a href="{% url 'admin_dashboard' %}" class="mobile-tab-item {% if 'admin' in request.resolver_match.url_name %}active{% endif %}">
+        <i class="bi bi-speedometer2"></i>
+        <span>Admin</span>
+      </a>
+    {% endif %}
+  </nav>
+
+  <!-- Luxury Minimalist Desktop Footer -->
+  {% if request.resolver_match.url_name != 'home' %}
+  <footer class="py-5 mt-5 d-none d-lg-block border-top" style="background: #ffffff;">
+    <div class="container px-4">
+      <div class="row align-items-center gy-4">
+        <div class="col-md-6">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <img src="{% static 'img/logo.png' %}" alt="ParkEase Logo" style="height: 36px; width: 36px; border-radius: 8px;">
+            <span class="fw-bold fs-5" style="color: var(--c1-navy);">Park<span style="color: var(--c5-orange);">Ease</span></span>
+          </div>
+          <p class="text-muted small mb-0" style="max-width: 440px;">
+            Intelligent parking slot reservation and management system with live sensor simulation, zero double-booking algorithm, and digital barrier pass verification.
+          </p>
+        </div>
+        <div class="col-md-3">
+          <div class="fw-bold small mb-2 text-uppercase" style="color: var(--c2-purple); letter-spacing: 0.05em;">Quick Links</div>
+          <div class="d-flex flex-column gap-1 small">
+            <a href="{% url 'home' %}" class="text-muted text-decoration-none">Home</a>
+            <a href="{% url 'check_availability' %}" class="text-muted text-decoration-none">Live Availability</a>
+            <a href="{% url 'check_booking' %}" class="text-muted text-decoration-none">Lookup Pass by Phone</a>
+          </div>
+        </div>
+        <div class="col-md-3 text-md-end">
+          <div class="live-beacon-pill mb-2">
+            <span class="pulse-dot"></span> System Operational
+          </div>
+          <div class="text-muted small">
+            &copy; 2026 ParkEase. All rights reserved.
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  {% endif %}
+
+  <!-- Bootstrap 5 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom JS -->
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

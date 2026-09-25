@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Find Reservation &bull; ParkEase{% endblock %}
+
+{% block content %}
+<div class="container px-3 py-3">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-9 col-lg-7">
+      
+      <!-- Lookup Form Card -->
+      <div class="app-card p-3 p-md-4 mb-3">
+        <div class="d-flex align-items-center justify-content-between mb-2 pb-2 border-bottom">
+          <div class="fw-bold d-flex align-items-center gap-2" style="color: var(--c1-navy); font-size: 0.95rem;">
+            <i class="bi bi-search" style="color: var(--c5-orange);"></i> Find Your Reservation
+          </div>
+          <span class="badge" style="background: rgba(237,158,91,0.2); color: #ab5712; font-size: 0.68rem; font-weight: 700;">LOOKUP</span>
+        </div>
+
+        <p class="text-muted small mb-3" style="font-size: 0.78rem;">
+          Enter your <strong>Phone Number</strong>, <strong>Booking ID</strong>, or both to view your pass or manage cancellations.
+        </p>
+
+        <form method="get" action="{% url 'check_booking' %}" class="row g-2">
+          {% if form.non_field_errors %}
+            <div class="col-12">
+              <div class="alert alert-warning py-2 small mb-1 border-0" style="font-size: 0.75rem;">
+                {{ form.non_field_errors.0 }}
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="col-12 col-sm-6">
+            <label class="form-label">Phone Number</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}
+              <div class="text-danger small mt-1" style="font-size: 0.72rem;">{{ form.phone.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-12 col-sm-6">
+            <label class="form-label">Booking ID (Optional)</label>
+            {{ form.booking_id }}
+            {% if form.booking_id.errors %}
+              <div class="text-danger small mt-1" style="font-size: 0.72rem;">{{ form.booking_id.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-12 pt-1">
+            <button type="submit" class="btn-app-primary">
+              <i class="bi bi-search"></i> Search Reservations
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {% if searched %}
+        {% if bookings %}
+          <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+            <span class="fw-bold small" style="color: var(--c1-navy);">
+              Found {{ bookings|length }} Reservation(s)
+            </span>
+            <span class="text-muted" style="font-size: 0.72rem;">Latest first</span>
+          </div>
+
+          {% for booking in bookings %}
+            <!-- Booking Result Card -->
+            <div class="app-card p-3 mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                <div>
+                  <span class="text-muted d-block" style="font-size: 0.65rem; text-transform: uppercase; font-weight: 700;">Booking ID</span>
+                  <span class="fw-bold font-monospace" style="color: var(--c5-orange); font-size: 0.95rem;">{{ booking.booking_id }}</span>
+                </div>
+                <div>
+                  {% if booking.status == 'CONFIRMED' %}
+                    <span class="badge" style="background: var(--c5-orange); color: #1B1931; font-weight: 700; font-size: 0.7rem;">CONFIRMED</span>
+                  {% elif booking.status == 'ACTIVE' %}
+                    <span class="badge" style="background: var(--c2-purple); color: #ffffff; font-weight: 700; font-size: 0.7rem;">PARKED</span>
+                  {% elif booking.status == 'COMPLETED' %}
+                    <span class="badge bg-secondary text-white font-weight-bold" style="font-size: 0.7rem;">COMPLETED</span>
+                  {% elif booking.status == 'CANCELLED' %}
+                    <span class="badge" style="background: var(--c4-crimson); color: #ffffff; font-weight: 700; font-size: 0.7rem;">CANCELLED</span>
+                  {% else %}
+                    <span class="badge" style="background: var(--c3-burgundy); color: #ffffff; font-size: 0.7rem;">{{ booking.status }}</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Compact Details -->
+              <div class="app-card-inset mb-2.5">
+                <div class="d-flex justify-content-between small mb-1">
+                  <span class="text-muted">Bay Slot:</span>
+                  <span class="fw-bold" style="color: var(--c1-navy);">{{ booking.parking_slot.slot_number }} ({{ booking.get_vehicle_type_display }})</span>
+                </div>
+                <div class="d-flex justify-content-between small mb-1">
+                  <span class="text-muted">Vehicle No:</span>
+                  <span class="fw-bold font-monospace" style="color: var(--c1-navy);">{{ booking.vehicle_number }}</span>
+                </div>
+                <div class="d-flex justify-content-between small mb-1">
+                  <span class="text-muted">Customer:</span>
+                  <span class="fw-semibold" style="color: var(--c1-navy);">{{ booking.customer_name }} &bull; {{ booking.phone }}</span>
+                </div>
+                <div class="d-flex justify-content-between small mb-1">
+                  <span class="text-muted">Schedule:</span>
+                  <span class="fw-semibold" style="color: var(--c1-navy);">{{ booking.booking_date|date:"d M Y" }} ({{ booking.start_time|time:"h:i A" }} – {{ booking.end_time|time:"h:i A" }})</span>
+                </div>
+                <div class="d-flex justify-content-between small">
+                  <span class="text-muted">Total Paid:</span>
+                  <span class="fw-bold" style="color: var(--c1-navy);">₹{{ booking.amount }}</span>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="d-flex gap-2">
+                <a href="{% url 'booking_confirmation' booking.booking_id %}" class="btn-app-secondary flex-fill" style="min-height: 36px; font-size: 0.8rem;">
+                  <i class="bi bi-qr-code"></i> View Pass
+                </a>
+
+                {% if booking.status == 'CONFIRMED' %}
+                  <button type="button" class="btn btn-outline-danger btn-sm rounded-3 px-3 fw-bold" style="font-size: 0.78rem;" data-bs-toggle="modal" data-bs-target="#cancelModal{{ booking.id }}">
+                    <i class="bi bi-x-circle"></i> Cancel
+                  </button>
+
+                  <!-- Cancel Modal -->
+                  <div class="modal fade" id="cancelModal{{ booking.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content border-0 app-card">
+                        <div class="modal-header border-0 pb-0">
+                          <h6 class="modal-title fw-bold" style="color: var(--c1-navy);">Cancel Reservation?</h6>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body py-3">
+                          <p class="small text-muted mb-0">
+                            Are you sure you want to cancel booking <strong>{{ booking.booking_id }}</strong> for Bay <strong>{{ booking.parking_slot.slot_number }}</strong>?
+                          </p>
+                        </div>
+                        <div class="modal-footer border-0 pt-0">
+                          <button type="button" class="btn btn-sm btn-light rounded-3" data-bs-dismiss="modal">Keep Booking</button>
+                          <form action="{% url 'cancel_booking' booking.booking_id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger rounded-3 fw-bold px-3">
+                              Yes, Cancel
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+
+            </div>
+          {% endfor %}
+
+        {% else %}
+          <div class="app-card text-center p-4">
+            <i class="bi bi-search text-muted fs-3 mb-2"></i>
+            <h6 class="fw-bold" style="color: var(--c1-navy);">No bookings found</h6>
+            <p class="small text-muted mb-0">No matching reservations found for the given details. Please check the phone number.</p>
+          </div>
+        {% endif %}
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

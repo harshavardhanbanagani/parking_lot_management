@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payments Audit Log - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="fw-bold text-dark mb-0">Payments Audit Log</h3>
+      <small class="text-muted">Recorded financial audit transactions</small>
+    </div>
+    <div class="badge bg-success-subtle text-success fs-6 p-2 px-3 rounded-pill border border-success-subtle">
+      Total Filtered Revenue: <strong>₹{{ total_amount }}</strong>
+    </div>
+  </div>
+
+  {% include 'admin/admin_nav.html' %}
+
+  <!-- Filter Panel -->
+  <div class="liquid-panel p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" name="q" class="form-control border-start-0" placeholder="Search Transaction ID, Booking ID, Customer..." value="{{ query }}">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <select name="method" class="form-select">
+          <option value="">All Payment Methods</option>
+          {% for m_val, m_lbl in methods %}
+            <option value="{{ m_val }}" {% if method_filter == m_val %}selected{% endif %}>{{ m_lbl }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-liquid-primary flex-grow-1">Filter</button>
+        <a href="{% url 'admin_payments' %}" class="btn btn-liquid-glass">Reset</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Payments Table -->
+  <div class="liquid-card p-4">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr class="text-muted small">
+            <th>TRANSACTION ID</th>
+            <th>BOOKING ID</th>
+            <th>CUSTOMER</th>
+            <th>BAY</th>
+            <th>AMOUNT</th>
+            <th>METHOD</th>
+            <th>STATUS</th>
+            <th>TIMESTAMP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in payments %}
+            <tr>
+              <td>
+                <span class="font-monospace fw-bold text-primary">{{ p.transaction_id }}</span>
+              </td>
+              <td>
+                <a href="{% url 'admin_booking_detail' p.booking.booking_id %}" class="font-monospace text-dark text-decoration-none fw-semibold">
+                  {{ p.booking.booking_id }}
+                </a>
+              </td>
+              <td>
+                <div class="fw-semibold text-dark">{{ p.booking.customer_name }}</div>
+                <small class="text-muted">{{ p.booking.phone }}</small>
+              </td>
+              <td>
+                <span class="badge bg-light text-dark border">{{ p.booking.parking_slot.slot_number }}</span>
+              </td>
+              <td>
+                <span class="fs-6 fw-bold text-success">₹{{ p.amount }}</span>
+              </td>
+              <td>
+                {% if p.payment_method == 'UPI' %}
+                  <span class="badge bg-info-subtle text-info rounded-pill px-2.5"><i class="bi bi-qr-code me-1"></i> UPI</span>
+                {% elif p.payment_method == 'CARD' %}
+                  <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5"><i class="bi bi-credit-card me-1"></i> Card</span>
+                {% else %}
+                  <span class="badge bg-secondary-subtle text-dark rounded-pill px-2.5"><i class="bi bi-cash me-1"></i> Cash</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-success rounded-pill px-2.5">{{ p.get_payment_status_display }}</span>
+              </td>
+              <td>
+                <small class="text-muted">{{ p.payment_date|date:"d M Y, h:i A" }}</small>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center py-4 text-muted">
+                No payment transactions found.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Staff Portal Login &bull; ParkEase{% endblock %}
+
+{% block content %}
+<div class="container px-3 py-4 py-md-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+      <div class="app-card p-4 shadow-sm">
+        
+        <div class="text-center mb-3">
+          <img src="{% static 'img/logo.png' %}" alt="ParkEase Logo" style="height: 52px; margin-bottom: 12px;">
+          <h5 class="fw-bold mb-1" style="color: var(--c1-navy);">Staff Operations Portal</h5>
+          <p class="text-muted small mb-0" style="font-size: 0.78rem;">Authorized Personnel Access</p>
+        </div>
+
+        <form method="post" action="{% url 'admin_login' %}">
+          {% csrf_token %}
+          
+          <div class="mb-2.5">
+            <label class="form-label">Username</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-person text-muted"></i></span>
+              <input type="text" name="username" class="form-control border-start-0" placeholder="Enter username" required autofocus autocomplete="username">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-key text-muted"></i></span>
+              <input type="password" name="password" class="form-control border-start-0" placeholder="Enter password" required autocomplete="current-password">
+            </div>
+          </div>
+
+          <button type="submit" class="btn-app-primary">
+            <i class="bi bi-box-arrow-in-right"></i> Log In to Dashboard
+          </button>
+        </form>
+
+        <div class="mt-3 p-2.5 app-card-inset text-center">
+          <small class="text-muted d-block fw-semibold" style="font-size: 0.72rem;">Demo Credentials:</small>
+          <small class="font-monospace d-block" style="color: var(--c1-navy); font-size: 0.78rem;">User: <strong>admin</strong> | Pass: <strong>admin123</strong></small>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

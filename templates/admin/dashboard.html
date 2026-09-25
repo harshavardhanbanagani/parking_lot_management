@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Operations Dashboard &bull; ParkEase{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="fw-bold text-dark mb-0">Operations Dashboard</h3>
+      <small class="text-muted">Current database-based parking metrics as of {{ today|date:"l, d F Y" }}</small>
+    </div>
+    <div>
+      <a href="{% url 'admin_add_slot' %}" class="btn btn-liquid-primary btn-sm">
+        <i class="bi bi-plus-circle me-1"></i> Add Bay
+      </a>
+      <a href="{% url 'admin_reports' %}" class="btn btn-liquid-glass btn-sm ms-2">
+        <i class="bi bi-file-earmark-bar-graph me-1"></i> Reports
+      </a>
+    </div>
+  </div>
+
+  {% include 'admin/admin_nav.html' %}
+
+  <!-- Liquid Control Center Metrics Tiles -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+      <div class="liquid-control-tile">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="small fw-bold text-uppercase" style="color: var(--c3-burgundy);">Total Bays</div>
+            <div class="fs-3 fw-extrabold" style="color: var(--c1-navy);">{{ total_slots }}</div>
+          </div>
+          <div class="tile-glow-icon tile-c1">
+            <i class="bi bi-grid-3x3-gap-fill"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="liquid-control-tile" style="border-color: var(--c5-orange);">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="small fw-bold text-uppercase" style="color: var(--c3-burgundy);">Currently Available</div>
+            <div class="fs-3 fw-extrabold" style="color: var(--c5-orange);">{{ available_slots }}</div>
+          </div>
+          <div class="tile-glow-icon tile-c5">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="liquid-control-tile">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="small fw-bold text-uppercase" style="color: var(--c3-burgundy);">Currently Booked</div>
+            <div class="fs-3 fw-extrabold" style="color: var(--c4-crimson);">{{ booked_slots }}</div>
+          </div>
+          <div class="tile-glow-icon tile-c4">
+            <i class="bi bi-calendar-check-fill"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="liquid-control-tile">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="small fw-bold text-uppercase" style="color: var(--c3-burgundy);">Currently Occupied</div>
+            <div class="fs-3 fw-extrabold" style="color: var(--c3-burgundy);">{{ occupied_slots }}</div>
+          </div>
+          <div class="tile-glow-icon tile-c3">
+            <i class="bi bi-car-front-fill"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="liquid-control-tile">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="small fw-bold text-uppercase" style="color: var(--c3-burgundy);">Today's Bookings</div>
+            <div class="fs-3 fw-extrabold" style="color: var(--c2-purple);">{{ today_bookings }}</div>
+          </div>
+          <div class="tile-glow-icon tile-c2">
+            <i class="bi bi-receipt"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="liquid-control-tile">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="small fw-bold text-uppercase" style="color: var(--c3-burgundy);">Today's Revenue</div>
+            <div class="fs-3 fw-extrabold" style="color: var(--c5-orange);">₹{{ today_revenue }}</div>
+          </div>
+          <div class="tile-glow-icon tile-c5">
+            <i class="bi bi-cash-coin"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="liquid-control-tile">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="small fw-bold text-uppercase" style="color: var(--c3-burgundy);">Total Customers</div>
+            <div class="fs-3 fw-extrabold" style="color: var(--c1-navy);">{{ total_customers }}</div>
+          </div>
+          <div class="tile-glow-icon tile-c6">
+            <i class="bi bi-people-fill"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-lg-3">
+      <div class="liquid-control-tile">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="small fw-bold text-uppercase" style="color: var(--c3-burgundy);">Recorded Revenue</div>
+            <div class="fs-3 fw-extrabold" style="color: var(--c1-navy);">₹{{ total_revenue_all }}</div>
+          </div>
+          <div class="tile-glow-icon tile-c1">
+            <i class="bi bi-wallet2"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Bookings Table -->
+  <div class="liquid-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h5 class="fw-bold mb-0 text-dark">Live Bay Activity & Check-In / Check-Out</h5>
+        <small class="text-muted">Direct operator controls</small>
+      </div>
+      <a href="{% url 'admin_bookings' %}" class="btn btn-liquid-glass btn-sm">
+        View All Bookings <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr class="text-muted small">
+            <th>BOOKING ID</th>
+            <th>CUSTOMER</th>
+            <th>VEHICLE</th>
+            <th>BAY</th>
+            <th>SCHEDULE</th>
+            <th>AMOUNT</th>
+            <th>STATUS</th>
+            <th class="text-end">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in recent_bookings %}
+            <tr>
+              <td>
+                <a href="{% url 'admin_booking_detail' b.booking_id %}" class="fw-bold text-primary font-monospace text-decoration-none">
+                  {{ b.booking_id }}
+                </a>
+              </td>
+              <td>
+                <div class="fw-semibold text-dark">{{ b.customer_name }}</div>
+                <small class="text-muted">{{ b.phone }}</small>
+              </td>
+              <td>
+                <span class="font-monospace fw-bold text-dark">{{ b.vehicle_number }}</span>
+                <span class="badge bg-light text-dark border ms-1">{{ b.get_vehicle_type_display }}</span>
+              </td>
+              <td>
+                <span class="badge bg-primary rounded-pill px-2.5 py-1 font-monospace">{{ b.parking_slot.slot_number }}</span>
+              </td>
+              <td>
+                <div>{{ b.booking_date|date:"d M Y" }}</div>
+                <small class="text-muted">{{ b.start_time|time:"h:i A" }} – {{ b.end_time|time:"h:i A" }}</small>
+              </td>
+              <td>
+                <span class="fw-bold text-success">₹{{ b.amount }}</span>
+              </td>
+              <td>
+                {% if b.status == 'CONFIRMED' %}
+                  <span class="badge bg-success rounded-pill">CONFIRMED</span>
+                {% elif b.status == 'ACTIVE' %}
+                  <span class="badge bg-primary rounded-pill">ACTIVE</span>
+                {% elif b.status == 'COMPLETED' %}
+                  <span class="badge bg-secondary rounded-pill">COMPLETED</span>
+                {% elif b.status == 'CANCELLED' %}
+                  <span class="badge bg-danger rounded-pill">CANCELLED</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark rounded-pill">{{ b.status }}</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  {% if b.status == 'CONFIRMED' %}
+                    <form method="post" action="{% url 'admin_check_in' b.booking_id %}" class="d-inline">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-success btn-sm rounded-start-pill px-2.5" title="Check-In Vehicle">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Check In
+                      </button>
+                    </form>
+                  {% elif b.status == 'ACTIVE' %}
+                    <form method="post" action="{% url 'admin_check_out' b.booking_id %}" class="d-inline">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-dark btn-sm rounded-start-pill px-2.5" title="Check-Out Vehicle">
+                        <i class="bi bi-box-arrow-right me-1"></i> Check Out
+                      </button>
+                    </form>
+                  {% endif %}
+                  <a href="{% url 'admin_booking_detail' b.booking_id %}" class="btn btn-liquid-glass btn-sm rounded-end-pill" title="View Details">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="8" class="text-center py-4 text-muted">
+                No bookings recorded yet.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking {{ booking.booking_id }} - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="fw-bold text-dark mb-0">Booking: <span class="text-primary font-monospace">{{ booking.booking_id }}</span></h3>
+      <small class="text-muted">Recorded on {{ booking.created_at|date:"d M Y, h:i A" }}</small>
+    </div>
+    <a href="{% url 'admin_bookings' %}" class="btn btn-liquid-glass btn-sm">
+      <i class="bi bi-arrow-left me-1"></i> Back
+    </a>
+  </div>
+
+  {% include 'admin/admin_nav.html' %}
+
+  <div class="row g-4">
+    <!-- Main Details -->
+    <div class="col-lg-8">
+      <div class="liquid-card p-4 p-md-5 mb-4">
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-info-circle text-primary me-2"></i> Reservation Details</h5>
+        
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6">
+            <div class="liquid-panel p-3">
+              <span class="text-muted small d-block">Status</span>
+              {% if booking.status == 'CONFIRMED' %}
+                <span class="badge bg-success rounded-pill px-3 py-1 fs-6">CONFIRMED</span>
+              {% elif booking.status == 'ACTIVE' %}
+                <span class="badge bg-primary rounded-pill px-3 py-1 fs-6">ACTIVE</span>
+              {% elif booking.status == 'COMPLETED' %}
+                <span class="badge bg-secondary rounded-pill px-3 py-1 fs-6">COMPLETED</span>
+              {% elif booking.status == 'CANCELLED' %}
+                <span class="badge bg-danger rounded-pill px-3 py-1 fs-6">CANCELLED</span>
+              {% else %}
+                <span class="badge bg-warning text-dark rounded-pill px-3 py-1 fs-6">{{ booking.status }}</span>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="col-sm-6">
+            <div class="liquid-panel p-3">
+              <span class="text-muted small d-block">Allocated Bay</span>
+              <span class="fs-5 fw-bold text-primary font-monospace">{{ booking.parking_slot.slot_number }}</span>
+              <small class="text-muted">({{ booking.parking_slot.get_vehicle_type_display }})</small>
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="liquid-panel p-3">
+              <span class="text-muted small d-block">Scheduled Date</span>
+              <span class="fw-bold text-dark">{{ booking.booking_date|date:"l, d F Y" }}</span>
+            </div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="liquid-panel p-3">
+              <span class="text-muted small d-block">Time Window</span>
+              <span class="fw-bold text-dark">{{ booking.start_time|time:"h:i A" }} – {{ booking.end_time|time:"h:i A" }} ({{ booking.duration_hours }}h)</span>
+            </div>
+          </div>
+        </div>
+
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person-circle text-primary me-2"></i> Customer & Vehicle</h5>
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6">
+            <span class="text-muted small d-block">Customer</span>
+            <div class="fw-bold text-dark">{{ booking.customer_name }}</div>
+          </div>
+          <div class="col-sm-6">
+            <span class="text-muted small d-block">Phone Number</span>
+            <div class="fw-bold text-dark font-monospace">{{ booking.phone }}</div>
+          </div>
+          <div class="col-sm-6">
+            <span class="text-muted small d-block">Vehicle Registration</span>
+            <div class="fw-bold font-monospace text-dark">{{ booking.vehicle_number }}</div>
+          </div>
+          <div class="col-sm-6">
+            <span class="text-muted small d-block">Email</span>
+            <div>{{ booking.email|default:"Not provided" }}</div>
+          </div>
+        </div>
+
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-clock-history text-primary me-2"></i> Check-in & Check-out Timestamps</h5>
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <span class="text-muted small d-block">Check-in Time</span>
+            <div class="fw-semibold">{{ booking.check_in_time|date:"d M Y, h:i:s A"|default:"Not checked in yet" }}</div>
+          </div>
+          <div class="col-sm-6">
+            <span class="text-muted small d-block">Check-out Time</span>
+            <div class="fw-semibold">{{ booking.check_out_time|date:"d M Y, h:i:s A"|default:"Not checked out yet" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions & Payment -->
+    <div class="col-lg-4">
+      <div class="liquid-card p-4 mb-4">
+        <h5 class="fw-bold text-dark mb-3">Operator Actions</h5>
+        <div class="d-grid gap-2">
+          {% if booking.status == 'CONFIRMED' %}
+            <form method="post" action="{% url 'admin_check_in' booking.booking_id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-liquid-success w-100 py-2 rounded-pill fw-semibold">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Perform Check-In
+              </button>
+            </form>
+          {% elif booking.status == 'ACTIVE' %}
+            <form method="post" action="{% url 'admin_check_out' booking.booking_id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-dark w-100 py-2 rounded-pill fw-semibold" style="border-radius: var(--radius-full);">
+                <i class="bi bi-box-arrow-right me-1"></i> Perform Check-Out
+              </button>
+            </form>
+          {% endif %}
+          <a href="{% url 'booking_confirmation' booking.booking_id %}" target="_blank" class="btn btn-liquid-glass">
+            <i class="bi bi-printer me-1"></i> View Pass
+          </a>
+        </div>
+      </div>
+
+      <div class="liquid-card p-4">
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-credit-card text-success me-2"></i> Payment Details</h5>
+        {% if booking.payment %}
+          <div class="mb-2">
+            <span class="text-muted small d-block">Transaction ID</span>
+            <span class="font-monospace fw-bold text-dark">{{ booking.payment.transaction_id }}</span>
+          </div>
+          <div class="mb-2">
+            <span class="text-muted small d-block">Method</span>
+            <span class="badge bg-light text-dark border">{{ booking.payment.get_payment_method_display }}</span>
+          </div>
+          <div class="mb-2">
+            <span class="text-muted small d-block">Status</span>
+            <span class="badge bg-success rounded-pill px-2.5">{{ booking.payment.get_payment_status_display }}</span>
+          </div>
+          <div class="liquid-divider"></div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-dark">Amount:</span>
+            <span class="fs-4 fw-extrabold text-success">₹{{ booking.amount }}</span>
+          </div>
+        {% else %}
+          <div class="alert alert-warning mb-0 small liquid-panel">No payment record found.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

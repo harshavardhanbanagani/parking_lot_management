@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ action }} Bay &bull; Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+      
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold text-dark mb-0">{{ action }} Parking Bay</h4>
+        <a href="{% url 'admin_slots' %}" class="btn btn-liquid-glass btn-sm">
+          <i class="bi bi-arrow-left me-1"></i> Back
+        </a>
+      </div>
+
+      <div class="liquid-card p-4 p-md-5">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label fw-bold text-muted small">BAY IDENTIFIER <span class="text-danger">*</span></label>
+            {{ form.slot_number }}
+            {% if form.slot_number.errors %}
+              <div class="text-danger small mt-1">{{ form.slot_number.errors.0 }}</div>
+            {% endif %}
+            <small class="text-muted">e.g. A01, A02, B01</small>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold text-muted small">VEHICLE TYPE ALLOCATION <span class="text-danger">*</span></label>
+            {{ form.vehicle_type }}
+            {% if form.vehicle_type.errors %}
+              <div class="text-danger small mt-1">{{ form.vehicle_type.errors.0 }}</div>
+            {% endif %}
+            <small class="text-muted">Rates apply automatically from Pricing configuration.</small>
+          </div>
+
+          <div class="mb-4 form-check form-switch liquid-panel p-3 ms-0 rounded-4">
+            <div class="ms-4">
+              {{ form.is_active }}
+              <label class="form-check-label fw-bold text-dark" for="{{ form.is_active.id_for_label }}">
+                Bay is Operational
+              </label>
+              <div class="text-muted small">Turn off to temporarily take this bay offline for maintenance.</div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between pt-3 border-top">
+            <a href="{% url 'admin_slots' %}" class="btn btn-liquid-glass px-4">Cancel</a>
+            <button type="submit" class="btn btn-liquid-primary px-4">
+              <i class="bi bi-check2-circle me-1"></i> Save Parking Bay
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

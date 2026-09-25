@@ -1,0 +1,39 @@
+<div class="liquid-panel p-2 mb-4 shadow-sm">
+  <ul class="nav nav-pills flex-column flex-md-row gap-1">
+    <li class="nav-item">
+      <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" href="{% url 'admin_dashboard' %}">
+        <i class="bi bi-speedometer2 me-1"></i> Dashboard
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if 'admin_slots' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'admin_slots' %}">
+        <i class="bi bi-grid-3x3-gap me-1"></i> Manage Bays
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if request.resolver_match.url_name == 'admin_pricing' %}active{% endif %}" href="{% url 'admin_pricing' %}">
+        <i class="bi bi-currency-rupee me-1"></i> Pricing Rates
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if 'admin_booking' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'admin_bookings' %}">
+        <i class="bi bi-journal-bookmark me-1"></i> Bookings
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if request.resolver_match.url_name == 'admin_customers' %}active{% endif %}" href="{% url 'admin_customers' %}">
+        <i class="bi bi-people me-1"></i> Customers
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if request.resolver_match.url_name == 'admin_payments' %}active{% endif %}" href="{% url 'admin_payments' %}">
+        <i class="bi bi-credit-card me-1"></i> Payments
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link {% if request.resolver_match.url_name == 'admin_reports' %}active{% endif %}" href="{% url 'admin_reports' %}">
+        <i class="bi bi-graph-up me-1"></i> Reports
+      </a>
+    </li>
+  </ul>
+</div>

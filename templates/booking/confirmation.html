@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Digital Pass &bull; {{ booking.booking_id }}{% endblock %}
+
+{% block content %}
+<div class="container px-3 py-3">
+  
+  <!-- Success Pill Alert -->
+  <div class="text-center mb-3 no-print">
+    <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm mb-1" style="background: var(--c5-orange); color: #1B1931; width: 44px; height: 44px;">
+      <i class="bi bi-check-lg fs-4"></i>
+    </div>
+    <div class="fw-bold" style="color: var(--c1-navy); font-size: 1.05rem;">Booking Confirmed!</div>
+    <div class="text-muted" style="font-size: 0.72rem;">Your parking bay has been allocated and secured</div>
+  </div>
+
+  <!-- Apple Wallet Pass Card -->
+  <div class="wallet-pass mb-3">
+    <!-- Pass Top Header -->
+    <div class="wallet-pass-header">
+      <div class="d-flex align-items-center gap-2">
+        <div class="app-logo-icon" style="width: 26px; height: 26px; font-size: 0.8rem;">
+          <i class="bi bi-p-square-fill"></i>
+        </div>
+        <div>
+          <div class="fw-bold" style="font-size: 0.85rem; line-height: 1.2;">ParkEase Pass</div>
+          <div class="text-white-50" style="font-size: 0.65rem;">Digital Parking Voucher</div>
+        </div>
+      </div>
+      <span class="badge" style="background: var(--c5-orange); color: #1B1931; font-weight: 700; font-size: 0.7rem;">
+        {{ booking.get_status_display }}
+      </span>
+    </div>
+
+    <!-- Pass Body -->
+    <div class="wallet-pass-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <div class="text-muted" style="font-size: 0.65rem; text-transform: uppercase; font-weight: 700;">Pass ID</div>
+          <div class="fw-extrabold font-monospace" style="color: var(--c1-navy); font-size: 1.15rem;">{{ booking.booking_id }}</div>
+        </div>
+        <div class="text-end">
+          <div class="text-muted" style="font-size: 0.65rem; text-transform: uppercase; font-weight: 700;">Bay Slot</div>
+          <div class="fw-extrabold font-monospace" style="color: var(--c5-orange); font-size: 1.4rem;">{{ booking.parking_slot.slot_number }}</div>
+        </div>
+      </div>
+
+      <!-- Inset Grid -->
+      <div class="app-card-inset mb-3" style="background: #faf8fa;">
+        <div class="row g-2">
+          <div class="col-6">
+            <span class="text-muted d-block" style="font-size: 0.65rem;">Vehicle</span>
+            <span class="fw-bold" style="font-size: 0.82rem; color: var(--c1-navy);">{{ booking.vehicle_number }}</span>
+            <div class="text-muted" style="font-size: 0.65rem;">{{ booking.get_vehicle_type_display }}</div>
+          </div>
+          <div class="col-6 text-end">
+            <span class="text-muted d-block" style="font-size: 0.65rem;">Customer</span>
+            <span class="fw-bold" style="font-size: 0.82rem; color: var(--c1-navy);">{{ booking.customer_name }}</span>
+            <div class="text-muted" style="font-size: 0.65rem;">{{ booking.phone }}</div>
+          </div>
+          <div class="col-6">
+            <span class="text-muted d-block" style="font-size: 0.65rem;">Date</span>
+            <span class="fw-bold" style="font-size: 0.82rem; color: var(--c1-navy);">{{ booking.booking_date|date:"d M Y" }}</span>
+          </div>
+          <div class="col-6 text-end">
+            <span class="text-muted d-block" style="font-size: 0.65rem;">Time Window</span>
+            <span class="fw-bold" style="font-size: 0.82rem; color: var(--c1-navy);">{{ booking.start_time|time:"h:i A" }} – {{ booking.end_time|time:"h:i A" }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notch Divider -->
+      <div class="pass-divider"></div>
+
+      <!-- Total & Payment Status -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <span class="text-muted d-block" style="font-size: 0.65rem; text-transform: uppercase; font-weight: 700;">Paid Amount</span>
+          <span class="fw-extrabold" style="color: var(--c1-navy); font-size: 1.3rem;">₹{{ booking.amount }}</span>
+        </div>
+        <div class="text-end">
+          {% if payment %}
+            <span class="badge" style="background: rgba(237,158,91,0.25); color: #ab5712; font-size: 0.72rem; font-weight: 700;">
+              {{ payment.get_payment_method_display }} &bull; VERIFIED
+            </span>
+            <div class="text-muted font-monospace" style="font-size: 0.65rem;">Txn: {{ payment.transaction_id }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- QR Code Simulator -->
+      <div class="text-center py-2">
+        <div class="qr-box mb-2">
+          <i class="bi bi-qr-code" style="font-size: 4rem; color: var(--c1-navy);"></i>
+        </div>
+        <div class="text-muted" style="font-size: 0.68rem;">Show at barrier gate scanner upon arrival</div>
+      </div>
+
+      <!-- User Friendly 1-Tap Copy Box -->
+      <div class="p-2 rounded-3 text-center my-2 d-flex align-items-center justify-content-between" style="background: rgba(233,188,185,0.25); border: 1px solid rgba(233,188,185,0.6);">
+        <span class="font-monospace fw-bold small text-dark ps-2">{{ booking.booking_id }}</span>
+        <button type="button" class="btn btn-sm btn-dark rounded-pill py-1 px-3" style="font-size: 0.75rem;" onclick="navigator.clipboard.writeText('{{ booking.booking_id }}'); this.innerHTML='<i class=\'bi bi-check2\'></i> Copied!'; setTimeout(() => this.innerHTML='<i class=\'bi bi-copy\'></i> Copy ID', 2000);">
+          <i class="bi bi-copy"></i> Copy ID
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Pass Actions Footer -->
+    <div class="wallet-pass-footer no-print d-flex gap-2">
+      <button onclick="window.print()" class="btn-app-secondary flex-fill" style="min-height: 40px; font-size: 0.85rem;">
+        <i class="bi bi-printer"></i> Print / PDF
+      </button>
+      <a href="https://api.whatsapp.com/send?text=ParkEase%20Reservation%20Confirmed!%20Booking%20ID:%20{{ booking.booking_id }}%20for%20Bay%20{{ booking.parking_slot.slot_number }}%20on%20{{ booking.booking_date }}" target="_blank" class="btn btn-success flex-fill rounded-3 d-flex align-items-center justify-content-center gap-1.5 fw-bold text-white text-decoration-none" style="min-height: 40px; font-size: 0.85rem; background: #25D366; border-color: #25D366;">
+        <i class="bi bi-whatsapp"></i> WhatsApp
+      </a>
+      <a href="{% url 'home' %}" class="btn-app-primary flex-fill" style="min-height: 40px; font-size: 0.85rem;">
+        <i class="bi bi-house"></i> Home
+      </a>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

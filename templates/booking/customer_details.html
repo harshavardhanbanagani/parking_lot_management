@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Enter Details &bull; Bay {{ slot.slot_number }}{% endblock %}
+
+{% block content %}
+<div class="container px-3 py-3">
+  
+  <!-- App Stepper -->
+  <div class="app-stepper px-2 mb-3">
+    <div class="step-item completed">
+      <div class="step-bubble"><i class="bi bi-check"></i></div>
+      <div class="step-label">Bay</div>
+    </div>
+    <div class="step-item active">
+      <div class="step-bubble">2</div>
+      <div class="step-label">Details</div>
+    </div>
+    <div class="step-item">
+      <div class="step-bubble">3</div>
+      <div class="step-label">Review</div>
+    </div>
+    <div class="step-item">
+      <div class="step-bubble">4</div>
+      <div class="step-label">Pass</div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <!-- Selected Bay Quick Summary -->
+    <div class="col-12 col-lg-4 order-lg-2">
+      <div class="app-card p-3">
+        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+          <span class="fw-bold small" style="color: var(--c1-navy);">Selected Bay</span>
+          <span class="badge" style="background: var(--c5-orange); color: #1B1931; font-size: 0.85rem; font-weight: 800;">
+            {{ slot.slot_number }}
+          </span>
+        </div>
+
+        <div class="d-flex justify-content-between small mb-1.5">
+          <span class="text-muted">Type:</span>
+          <span class="fw-bold" style="color: var(--c1-navy);">{{ slot.get_vehicle_type_display }}</span>
+        </div>
+        <div class="d-flex justify-content-between small mb-1.5">
+          <span class="text-muted">Date:</span>
+          <span class="fw-semibold" style="color: var(--c1-navy);">{{ search_params.booking_date }}</span>
+        </div>
+        <div class="d-flex justify-content-between small mb-1.5">
+          <span class="text-muted">Window:</span>
+          <span class="fw-semibold" style="color: var(--c1-navy);">{{ search_params.start_time }} – {{ search_params.end_time }}</span>
+        </div>
+        <div class="d-flex justify-content-between small mb-1.5">
+          <span class="text-muted">Duration:</span>
+          <span class="fw-semibold" style="color: var(--c1-navy);">{{ duration_hours }} hr(s)</span>
+        </div>
+        <div class="d-flex justify-content-between small mb-2">
+          <span class="text-muted">Rate:</span>
+          <span class="fw-semibold" style="color: var(--c1-navy);">₹{{ rate }}/hr</span>
+        </div>
+
+        <div class="p-2 rounded-3 text-center my-2" style="background: rgba(233,188,185,0.2); border: 1px solid rgba(233,188,185,0.6);">
+          <div class="text-muted" style="font-size: 0.7rem; text-transform: uppercase;">Estimated Total</div>
+          <div class="fw-extrabold" style="color: var(--c1-navy); font-size: 1.3rem;">₹{{ total_amount }}</div>
+        </div>
+
+        <a href="{% url 'check_availability' %}" class="btn-app-secondary w-100 mt-1" style="font-size: 0.8rem; min-height: 36px;">
+          <i class="bi bi-arrow-left"></i> Change Slot
+        </a>
+      </div>
+    </div>
+
+    <!-- Customer Form -->
+    <div class="col-12 col-lg-8 order-lg-1">
+      <div class="app-card p-3 p-md-4">
+        <div class="fw-bold mb-1 d-flex align-items-center gap-2" style="color: var(--c1-navy); font-size: 0.95rem;">
+          <i class="bi bi-person-circle" style="color: var(--c5-orange);"></i> Customer Information
+        </div>
+        <p class="text-muted small mb-3">
+          Enter driver info for automatic barrier recognition and SMS pass delivery.
+        </p>
+
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="mb-2.5">
+            <label class="form-label">Full Name <span class="text-danger">*</span></label>
+            {{ form.customer_name }}
+            {% if form.customer_name.errors %}
+              <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ form.customer_name.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="row g-2 mb-2.5">
+            <div class="col-12 col-sm-6">
+              <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+              {{ form.phone }}
+              {% if form.phone.errors %}
+                <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ form.phone.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-12 col-sm-6">
+              <label class="form-label">Email (Optional)</label>
+              {{ form.email }}
+              {% if form.email.errors %}
+                <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ form.email.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Vehicle Registration Number <span class="text-danger">*</span></label>
+            {{ form.vehicle_number }}
+            {% if form.vehicle_number.errors %}
+              <div class="text-danger small mt-1" style="font-size: 0.75rem;">{{ form.vehicle_number.errors.0 }}</div>
+            {% endif %}
+            <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">Example: KA-01-AB-1234, DL-3C-9999</small>
+          </div>
+
+          <button type="submit" class="btn-app-primary">
+            <span>Continue to Review</span>
+            <i class="bi bi-arrow-right"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

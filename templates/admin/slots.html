@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Bays &bull; Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="fw-bold text-dark mb-0">Manage Parking Bays</h3>
+      <small class="text-muted">Configure operational parking bays and vehicle allocations</small>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{% url 'admin_pricing' %}" class="btn btn-liquid-glass btn-sm">
+        <i class="bi bi-currency-rupee me-1"></i> Rates (Car: ₹{{ car_rate }} | Bike: ₹{{ bike_rate }})
+      </a>
+      <a href="{% url 'admin_add_slot' %}" class="btn btn-liquid-primary btn-sm">
+        <i class="bi bi-plus-circle me-1"></i> Add Bay
+      </a>
+    </div>
+  </div>
+
+  {% include 'admin/admin_nav.html' %}
+
+  <!-- Filter Panel -->
+  <div class="liquid-panel p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-md-4">
+        <select name="vehicle_type" class="form-select">
+          <option value="">All Vehicle Types</option>
+          <option value="CAR" {% if selected_v_type == 'CAR' %}selected{% endif %}>Car Bays</option>
+          <option value="BIKE" {% if selected_v_type == 'BIKE' %}selected{% endif %}>Bike Bays</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <select name="is_active" class="form-select">
+          <option value="">All Operational Status</option>
+          <option value="true" {% if selected_status == 'true' %}selected{% endif %}>Active / Operational</option>
+          <option value="false" {% if selected_status == 'false' %}selected{% endif %}>Inactive / Maintenance</option>
+        </select>
+      </div>
+      <div class="col-md-4 d-flex gap-2">
+        <button type="submit" class="btn btn-liquid-primary flex-grow-1">
+          <i class="bi bi-funnel me-1"></i> Filter
+        </button>
+        <a href="{% url 'admin_slots' %}" class="btn btn-liquid-glass">Reset</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Slots Table -->
+  <div class="liquid-card p-4">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr class="text-muted small">
+            <th>BAY NUMBER</th>
+            <th>VEHICLE ALLOCATION</th>
+            <th>EFFECTIVE HOURLY RATE</th>
+            <th>STATUS</th>
+            <th>CREATED AT</th>
+            <th class="text-end">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for slot in slots %}
+            <tr>
+              <td>
+                <span class="fs-5 fw-bold text-primary font-monospace">{{ slot.slot_number }}</span>
+              </td>
+              <td>
+                {% if slot.vehicle_type == 'CAR' %}
+                  <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1"><i class="bi bi-car-front-fill me-1"></i> Car</span>
+                {% else %}
+                  <span class="badge bg-warning-subtle text-dark rounded-pill px-3 py-1"><i class="bi bi-bicycle me-1"></i> Bike</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if slot.vehicle_type == 'CAR' %}
+                  <span class="fw-semibold text-dark">₹{{ car_rate }} / hr</span>
+                {% else %}
+                  <span class="fw-semibold text-dark">₹{{ bike_rate }} / hr</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if slot.is_active %}
+                  <span class="badge bg-success rounded-pill px-3 py-1">Operational</span>
+                {% else %}
+                  <span class="badge bg-secondary rounded-pill px-3 py-1">Maintenance</span>
+                {% endif %}
+              </td>
+              <td>
+                <small class="text-muted">{{ slot.created_at|date:"d M Y, h:i A" }}</small>
+              </td>
+              <td class="text-end">
+                <a href="{% url 'admin_edit_slot' slot.id %}" class="btn btn-liquid-glass btn-sm me-1">
+                  <i class="bi bi-pencil-square"></i> Edit
+                </a>
+                <form method="post" action="{% url 'admin_delete_slot' slot.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete Slot {{ slot.slot_number }}?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                    <i class="bi bi-trash"></i> Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">
+                No parking slots found.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

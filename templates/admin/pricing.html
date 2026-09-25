@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Pricing &bull; Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="mb-3">
+    <h3 class="fw-bold text-dark mb-0">Centralized Pricing Rates</h3>
+    <small class="text-muted">Single source of truth for standard hourly parking rates</small>
+  </div>
+
+  {% include 'admin/admin_nav.html' %}
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="liquid-card p-4 p-md-5">
+        <form method="post" action="{% url 'admin_pricing' %}">
+          {% csrf_token %}
+
+          <div class="row g-4 mb-4">
+            <!-- Car Pricing Card -->
+            <div class="col-md-6">
+              <div class="liquid-panel p-4 h-100">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="bg-primary text-white rounded-circle p-2 me-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 46px; height: 46px;">
+                    <i class="bi bi-car-front-fill fs-5"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold mb-0 text-dark">Car Parking</h5>
+                    <small class="text-muted">4-Wheeler Base Rate</small>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-bold text-muted small">HOURLY RATE (₹)</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-white">₹</span>
+                    <input type="number" step="0.50" min="0" name="car_rate" class="form-control form-control-lg fw-bold" value="{{ car_pricing.price_per_hour }}" required>
+                    <span class="input-group-text bg-white">/ hr</span>
+                  </div>
+                </div>
+                <small class="text-muted">Updated: {{ car_pricing.updated_at|date:"d M Y, h:i A" }}</small>
+              </div>
+            </div>
+
+            <!-- Bike Pricing Card -->
+            <div class="col-md-6">
+              <div class="liquid-panel p-4 h-100">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="bg-warning text-dark rounded-circle p-2 me-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 46px; height: 46px;">
+                    <i class="bi bi-bicycle fs-5"></i>
+                  </div>
+                  <div>
+                    <h5 class="fw-bold mb-0 text-dark">Bike Parking</h5>
+                    <small class="text-muted">2-Wheeler Base Rate</small>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label fw-bold text-muted small">HOURLY RATE (₹)</label>
+                  <div class="input-group">
+                    <span class="input-group-text bg-white">₹</span>
+                    <input type="number" step="0.50" min="0" name="bike_rate" class="form-control form-control-lg fw-bold" value="{{ bike_pricing.price_per_hour }}" required>
+                    <span class="input-group-text bg-white">/ hr</span>
+                  </div>
+                </div>
+                <small class="text-muted">Updated: {{ bike_pricing.updated_at|date:"d M Y, h:i A" }}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-end pt-3 border-top">
+            <button type="submit" class="btn btn-liquid-primary px-5 py-2">
+              <i class="bi bi-save me-1"></i> Update Pricing Configuration
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

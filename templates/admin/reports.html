@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Operational & Financial Reports - Admin{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="mb-3">
+    <h3 class="fw-bold text-dark mb-0">Operational & Financial Reports</h3>
+    <small class="text-muted">Summary metrics for daily floor operations and monthly revenue analysis</small>
+  </div>
+
+  {% include 'admin/admin_nav.html' %}
+
+  <!-- Daily Report Section -->
+  <div class="liquid-card p-4 p-md-5 mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="fw-bold mb-1 text-primary"><i class="bi bi-calendar-day me-2"></i> Daily Operational Report</h4>
+        <p class="text-muted small mb-0">Detailed breakdown for <strong>{{ daily_date|date:"l, d F Y" }}</strong></p>
+      </div>
+
+      <form method="get" class="d-flex gap-2 align-items-center mt-2 mt-md-0">
+        <input type="date" name="daily_date" class="form-control form-control-sm" value="{{ daily_date|date:'Y-m-d' }}">
+        <button type="submit" class="btn btn-liquid-primary btn-sm">Generate</button>
+      </form>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-sm-6 col-lg-3">
+        <div class="liquid-control-tile text-center">
+          <div class="text-muted small fw-bold">TOTAL BOOKINGS</div>
+          <div class="fs-3 fw-extrabold text-dark">{{ daily_total_bookings }}</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="liquid-control-tile text-center">
+          <div class="text-muted small fw-bold">COMPLETED (PARKED & LEFT)</div>
+          <div class="fs-3 fw-extrabold text-secondary">{{ daily_completed }}</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="liquid-control-tile text-center">
+          <div class="text-muted small fw-bold">CANCELLED BOOKINGS</div>
+          <div class="fs-3 fw-extrabold text-danger">{{ daily_cancelled }}</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div class="liquid-control-tile text-center">
+          <div class="text-muted small fw-bold">DAILY REVENUE RECORDED</div>
+          <div class="fs-3 fw-extrabold text-success">₹{{ daily_revenue }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Report Section -->
+  <div class="liquid-card p-4 p-md-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="fw-bold mb-1 text-success"><i class="bi bi-calendar-month me-2"></i> Monthly Financial Summary</h4>
+        <p class="text-muted small mb-0">Performance report for <strong>{{ selected_month }}/{{ selected_year }}</strong></p>
+      </div>
+
+      <form method="get" class="d-flex gap-2 align-items-center mt-2 mt-md-0">
+        <select name="month" class="form-select form-select-sm">
+          {% for m in months %}
+            <option value="{{ m }}" {% if m == selected_month %}selected{% endif %}>Month {{ m }}</option>
+          {% endfor %}
+        </select>
+        <select name="year" class="form-select form-select-sm">
+          {% for y in years %}
+            <option value="{{ y }}" {% if y == selected_year %}selected{% endif %}>{{ y }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-liquid-primary btn-sm">Generate</button>
+      </form>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <div class="col-md-6">
+        <div class="liquid-panel p-4">
+          <h6 class="fw-bold text-dark mb-3"><i class="bi bi-pie-chart me-1 text-primary"></i> Monthly Aggregate Metrics</h6>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-muted">Total Monthly Bookings:</span>
+            <span class="fw-bold fs-5 text-dark">{{ monthly_total_bookings }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">Total Recorded Revenue:</span>
+            <span class="fw-bold fs-4 text-success">₹{{ monthly_revenue }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="liquid-panel p-4">
+          <h6 class="fw-bold text-dark mb-3"><i class="bi bi-segmented-nav me-1 text-success"></i> Category Breakdown</h6>
+          <div class="d-flex justify-content-between mb-2">
+            <span><i class="bi bi-car-front-fill text-primary me-1"></i> Car Bookings ({{ monthly_car_bookings }}):</span>
+            <span class="fw-bold text-dark">₹{{ monthly_car_revenue }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span><i class="bi bi-bicycle text-warning me-1"></i> Bike Bookings ({{ monthly_bike_bookings }}):</span>
+            <span class="fw-bold text-dark">₹{{ monthly_bike_revenue }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
