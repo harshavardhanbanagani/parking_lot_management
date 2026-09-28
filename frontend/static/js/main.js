@@ -1,33 +1,6 @@
 // JavaScript for Online Parking Slot Reservation System & Animations
 
 document.addEventListener('DOMContentLoaded', function() {
-    // -------------------------------------------------------------------------
-    // App Launch Minimalist Logo Splash Screen Handler
-    // -------------------------------------------------------------------------
-    const splashScreen = document.getElementById('app-splash-screen');
-
-    if (splashScreen) {
-        const hasSeenSplash = sessionStorage.getItem('parkease_splash_session');
-
-        const dismissSplash = () => {
-            splashScreen.classList.add('hide-splash');
-            sessionStorage.setItem('parkease_splash_session', 'true');
-        };
-
-        // Tap anywhere to skip instantly
-        splashScreen.addEventListener('click', dismissSplash);
-
-        if (!hasSeenSplash) {
-            // Smooth exit transition after 1.1s
-            setTimeout(() => {
-                dismissSplash();
-            }, 1100);
-        } else {
-            // Fast fade if already seen in current browsing session
-            splashScreen.classList.add('hide-splash');
-        }
-    }
-
     // Page Transition Progress Indicator Completion
     const progressBar = document.getElementById('app-page-progress');
     if (progressBar) {

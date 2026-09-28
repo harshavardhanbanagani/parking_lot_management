@@ -1137,85 +1137,8 @@ body {
 .parking-bay-grid .bay-card:nth-child(7) { animation-delay: 0.14s; }
 .parking-bay-grid .bay-card:nth-child(8) { animation-delay: 0.16s; }
 
-/* ==========================================================================
-   MINIMALIST LOGO SPLASH SCREEN
-   ========================================================================== */
-
-/* Splash Screen Full-Screen Overlay */
-.splash-screen-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100000;
-  background: radial-gradient(circle at 50% 40%, #44174E 0%, #1B1931 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  text-align: center;
-  user-select: none;
-  touch-action: none;
-  cursor: pointer;
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
-}
-
-.splash-screen-overlay.hide-splash {
-  opacity: 0;
-  transform: scale(1.08);
-  pointer-events: none;
-  visibility: hidden;
-}
-
-.splash-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  animation: splashFadeIn 0.35s ease-out;
-}
-
-@keyframes splashFadeIn {
-  0% { opacity: 0; transform: scale(0.88); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-.splash-logo-wrap {
-  position: relative;
-  display: inline-block;
-}
-
-.splash-logo-img {
-  width: 96px;
-  height: 96px;
-  border-radius: 24px;
-  object-fit: cover;
-  box-shadow: 0 16px 40px rgba(237, 158, 91, 0.45);
-  position: relative;
-  z-index: 2;
-  animation: splashLogoPulse 1.4s infinite alternate ease-in-out;
-}
-
-.splash-logo-glow {
-  position: absolute;
-  inset: -12px;
-  background: radial-gradient(circle, rgba(237, 158, 91, 0.55) 0%, transparent 70%);
-  border-radius: 36px;
-  z-index: 1;
-  filter: blur(12px);
-  animation: splashGlowPulse 1.4s infinite alternate ease-in-out;
-}
-
-@keyframes splashLogoPulse {
-  0% { transform: scale(0.96); }
-  100% { transform: scale(1.06); }
-}
-
-@keyframes splashGlowPulse {
-  0% { opacity: 0.5; transform: scale(0.9); }
-  100% { opacity: 1; transform: scale(1.15); }
-}
-
 @media print {
-  .no-print, .app-header, .mobile-bottom-bar, footer, #app-page-progress, .splash-screen-overlay {
+  .no-print, .app-header, .mobile-bottom-bar, footer, #app-page-progress {
     display: none !important;
   }
   body {
