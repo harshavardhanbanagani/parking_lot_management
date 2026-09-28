@@ -57,53 +57,60 @@ An integrated **Admin Dashboard** provides facility operators with full control 
 ```text
 parking_management_system/
 │
-├── manage.py
-├── requirements.txt
+├── manage.py                # Root command forwarder (runs backend seamlessly)
+├── requirements.txt         # Root deployment dependencies
+├── Procfile                 # Root cloud deployment process file
 ├── README.md
 │
-├── parking_system/
-│   ├── __init__.py          # PyMySQL integration
-│   ├── settings.py          # Database & app configuration
-│   ├── urls.py              # Root routing
-│   ├── wsgi.py & asgi.py
+├── frontend/                # 🎨 FRONTEND ASSETS & TEMPLATES
+│   ├── static/              # Static styling, scripts, and visual media
+│   │   ├── css/custom.css   # Sunset Twilight design system & responsive styling
+│   │   ├── js/main.js       # Dynamic forms, payment switcher & splash screen
+│   │   └── img/             # Logo and promotional graphics
+│   └── templates/           # Django HTML Templates (Bootstrap 5)
+│       ├── base.html        # Master responsive layout & logo splash overlay
+│       ├── home.html        # Public hero landing page & booking entry card
+│       ├── booking/         # Customer reservation flow
+│       │   ├── check_availability.html  # Date/Time selector & visual bay layout
+│       │   ├── customer_details.html    # Vehicle & customer input form
+│       │   ├── review_booking.html      # Pre-payment verification summary
+│       │   ├── payment.html             # Demo payment simulation (UPI, Card, Cash)
+│       │   ├── confirmation.html        # Printable parking voucher
+│       │   └── check_booking.html       # Booking lookup & instant cancellation
+│       └── admin/           # Administrative Management Portal
+│           ├── admin_nav.html           # Admin sub-navigation bar
+│           ├── login.html               # Staff login portal
+│           ├── dashboard.html           # Live database metrics & quick actions
+│           ├── slots.html               # Parking slots table (Add/Edit/Toggle)
+│           ├── slot_form.html           # Slot configuration form
+│           ├── pricing.html             # Hourly rate management (Car/Bike)
+│           ├── bookings.html            # Searchable bookings ledger
+│           ├── booking_detail.html      # Detailed booking audit view
+│           ├── customers.html           # Aggregated customer directory
+│           ├── payments.html            # Transaction audit log
+│           └── reports.html             # Daily & Monthly report summaries
 │
-├── parking/
-│   ├── admin.py             # Django admin model registrations
-│   ├── forms.py             # Availability, customer, payment, slot forms
-│   ├── models.py            # ParkingSlot, Pricing, Booking, Payment
-│   ├── tests.py             # 7 automated test suites
-│   ├── urls.py              # Customer and admin URL patterns
-│   ├── utils.py             # Availability engine, vehicle validation, pricing logic
-│   ├── views.py             # Customer & Admin business controllers
-│   └── management/commands/
-│       └── seed_data.py     # Automated sample data & admin creator
-│
-├── static/
-│   ├── css/custom.css       # Visual bays, badges, printable voucher styling
-│   └── js/main.js           # Payment switcher & form helpers
-│
-└── templates/
-    ├── base.html            # Master layout with navbar & footer
-    ├── home.html            # Public landing page
-    ├── booking/
-    │   ├── check_availability.html  # Date/Time selector & visual slot layout
-    │   ├── customer_details.html    # Vehicle & customer input form
-    │   ├── review_booking.html      # Pre-payment verification summary
-    │   ├── payment.html             # Demo payment simulation
-    │   ├── confirmation.html        # Printable parking voucher
-    │   └── check_booking.html       # Booking lookup & cancellation
-    └── admin/
-        ├── admin_nav.html           # Admin sub-navigation bar
-        ├── login.html               # Staff login portal
-        ├── dashboard.html           # Current database-based parking metrics & actions
-        ├── slots.html               # Parking slots table
-        ├── slot_form.html           # Slot add/edit form
-        ├── pricing.html             # Hourly pricing configuration
-        ├── bookings.html            # Searchable bookings ledger
-        ├── booking_detail.html      # Detailed booking audit view
-        ├── customers.html           # Aggregated customer directory
-        ├── payments.html            # Transaction audit log
-        └── reports.html             # Daily & Monthly report summaries
+└── backend/                 # ⚙️ BACKEND DJANGO APPLICATION & DATABASE
+    ├── manage.py            # Backend management CLI
+    ├── requirements.txt     # Python requirements
+    ├── Procfile             # Web service runner
+    ├── db.sqlite3           # SQLite Database
+    ├── parking_system/      # Core Django Project Configuration
+    │   ├── __init__.py      # PyMySQL initialization
+    │   ├── settings.py      # App settings & frontend paths
+    │   ├── urls.py          # Root routing
+    │   ├── wsgi.py          # WSGI entrypoint
+    │   └── asgi.py          # ASGI entrypoint
+    └── parking/             # Parking Business Logic App
+        ├── admin.py         # Django admin model registrations
+        ├── forms.py         # Form validators
+        ├── models.py        # ParkingSlot, Pricing, Booking, Payment models
+        ├── tests.py         # Automated unit & integration tests
+        ├── urls.py          # URL routing
+        ├── utils.py         # Dynamic availability engine & calculations
+        ├── views.py         # Customer & Admin business controllers
+        └── management/commands/
+            └── seed_data.py # Database seeder command
 ```
 
 ---

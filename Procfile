@@ -1,1 +1,1 @@
-web: gunicorn parking_system.wsgi:application
+web: gunicorn --chdir backend parking_system.wsgi:application
